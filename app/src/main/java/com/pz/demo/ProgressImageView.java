@@ -37,13 +37,22 @@ public class ProgressImageView extends ImageView{
 
     void drawProgress(Canvas can){
         float rotation=getRotation();
+        int width=caculateMaskRectWidth(getWidth(),getHeight());
+        int xOffset=width-getWidth()/2;
+        int yOffset=width-getHeight()/2;
         Paint paint=new Paint();
         paint.setColor(Color.RED);
         paint.setAntiAlias(true);
-        LinearGradient lg=new LinearGradient(0,0,getWidth(),getHeight(),new int[]{Color.RED,Color.RED},new float[]{0.0f,1.0f}, Shader.TileMode.CLAMP);
         can.rotate(-rotation,getWidth()/2,getHeight()/2);
-        paint.setShader(lg);
-        can.drawRect(0,0,getWidth(),getHeight(),paint);
+        can.translate(0,2*width-2);
+        can.drawRect(-xOffset,-yOffset,width+xOffset,width+yOffset,paint);
+
+
         invalidate();
     }
+
+    int caculateMaskRectWidth(int width,int height){
+        return (int) Math.sqrt(width*width+height*height);
+    }
+
 }
