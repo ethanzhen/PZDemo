@@ -1,5 +1,6 @@
 package com.pz.demo;
 
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,19 +16,27 @@ import android.widget.ImageView;
  */
 public class ProgressImageView extends ImageView{
 
-    private int progress=0;
+    private float progress=20;
     private static final int MAX_PROGRESS=100;
-
+    private float density;
     public ProgressImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+       init(context);
     }
 
     public ProgressImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(context);
     }
 
     public ProgressImageView(Context context) {
         super(context);
+        init(context);
+    }
+
+    void init(Context context){
+        density=context.getResources().getDisplayMetrics().density;
+
     }
 
     @Override
@@ -38,33 +47,80 @@ public class ProgressImageView extends ImageView{
 
     void drawProgress(Canvas can){
         float rotation=getRotation();
-        int width=caculateMaskRectWidth(getWidth(),getHeight());
-        int xOffset=width-getWidth()/2;
-        int yOffset=width-getHeight()/2;
+        Point rectPoint=caculateMaskRectWidthAndHeight(getWidth(),getHeight());
+        int xOffset=(rectPoint.x-getWidth())/2;
+        int yOffset=(rectPoint.y-getHeight())/2;
         Paint paint=new Paint();
-        paint.setColor(Color.RED);
+        paint.setColor(Color.BLACK);
+        paint.setAlpha(122);
         paint.setAntiAlias(true);
         can.rotate(-rotation,getWidth()/2,getHeight()/2);
-        can.translate(0,2*width-2);
-        can.drawRect(-xOffset,-yOffset,width+xOffset,width+yOffset,paint);
+        float height=caculateProgress(rectPoint.y);
+        can.translate(0,height);
+        can.drawRect(-xOffset,-yOffset,rectPoint.x-xOffset,rectPoint.y-yOffset,paint);
+        drawText(can,rectPoint.y-yOffset,height,xOffset,yOffset,rectPoint.y);
         invalidate();
     }
 
-    int caculateMaskRectWidth(int width,int height){
-        return (int) Math.sqrt(width*width+height*height);
+
+    float caculateProgress(int height){
+        return (int) (-(progress/100)*height);
     }
 
-    Point caculateTranslat(){
+    Point caculateMaskRectWidthAndHeight(int width,int height){
+        double radius=Math.toRadians(getRotation());
         Point p=new Point();
-        float rotation=getRotation();
-        double radius=  Math.toRadians(rotation);
-        double r=  Math.sqrt(getWidth()*getWidth()+getHeight()*getHeight());
-        double radius90=Math.toRadians(90);
-        double radiusB=Math.atan(getHeight()/getWidth());
-        p.x= (int) (getWidth()*Math.cos(radius)+getHeight()*Math.sin(radius)+2*Math.sin(radius/2)*r*Math.sin(radius90+radius/2-radiusB));
-        p.y= (int) (getHeight()*Math.cos(radius)-getWidth()*Math.sin(radius)+2*Math.cos(radius/2)*r*Math.sin(radius90+radius/2-radiusB));
+        p.x= (int) (width*Math.cos(radius)+height*Math.sin(radius));
+        p.y= (int) (height*Math.cos(radius)+width*Math.sin(radius));
         return p;
     }
 
+    void drawText(Canvas canvas,float y,float height,float xOffset,float yOffset,int maskHeight){
+        Paint paint=new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(18*density);
+        String text=(int)progress+"%";
+        int textWidth=getTextWidth(paint,text);
+        double radius=Math.toRadians(getRotation());
+        float he=Math.abs(height);
+        float yRight=(float) (getHeight()*Math.cos(radius));
+        canvas.drawText(text,caculateTextCenterX(height,xOffset,yOffset,maskHeight)-textWidth/2,y-5*density,paint);
+    }
 
+    public void setProgress(float progress) {
+        this.progress = progress;
+    }
+
+     int getTextWidth(Paint paint, String str) {
+        int iRet = 0;
+        if (str != null && str.length() > 0) {
+            int len = str.length();
+            float[] widths = new float[len];
+            paint.getTextWidths(str, widths);
+            for (int j = 0; j < len; j++) {
+                iRet += (int) Math.ceil(widths[j]);
+            }
+        }
+        return iRet;
+    }
+
+
+    int caculateTextCenterX(float height,float xOffset,float yOffset,int maskHeight){
+        double radius=Math.toRadians(getRotation());
+        float he=Math.abs(height);
+        float yLeft= (float) (getWidth()*Math.sin(radius));
+        float yRight=(float) (getHeight()*Math.cos(radius));
+        int v;
+        if(he<=yLeft){
+            he=he;
+            v=(int) ((getWidth()-he/Math.sin(radius))*Math.cos(radius)+he*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset);
+        }else if(he <=yRight){
+            v=(int) ((getWidth()-yLeft/Math.sin(radius))*Math.cos(radius)+yLeft*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset+(he-yLeft)*Math.tan(radius));
+        }else{
+            he=maskHeight-he;
+            v=(int) (getWidth()-((getWidth()-he/Math.sin(radius))*Math.cos(radius)+he*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset));
+        }
+
+        return v;
+    }
 }

@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private TextView tv;
+    private ProgressImageView piv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,8 +28,10 @@ public class MainActivity extends AppCompatActivity {
                 animator.start();
             }
         });
-
-
+        piv= (ProgressImageView) findViewById(R.id.piv);
+        ObjectAnimator oa=ObjectAnimator.ofFloat(piv,"progress",0,100);
+        oa.setDuration(20000);
+        oa.start();
 
     }
     private class MyEvaluator implements TypeEvaluator{

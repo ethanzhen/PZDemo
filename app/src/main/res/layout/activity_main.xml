@@ -27,11 +27,12 @@
         android:id="@+id/btn"/>
 
     <com.pz.demo.ProgressImageView
-        android:layout_width="200dp"
-        android:layout_height="150dp"
+        android:layout_width="250dp"
+        android:layout_height="200dp"
         android:layout_centerInParent="true"
-        android:rotation="30"
+        android:rotation="-30"
         android:background="@mipmap/bofang_bg2"
+        android:id="@+id/piv"
         />
 
 
