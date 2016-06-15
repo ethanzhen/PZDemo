@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Shader;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 /**
@@ -68,7 +69,7 @@ public class ProgressImageView extends ImageView{
     }
 
     Point caculateMaskRectWidthAndHeight(int width,int height){
-        double radius=Math.toRadians(getRotation());
+        double radius=Math.toRadians(Math.abs(getRotation()));
         Point p=new Point();
         p.x= (int) (width*Math.cos(radius)+height*Math.sin(radius));
         p.y= (int) (height*Math.cos(radius)+width*Math.sin(radius));
@@ -81,7 +82,7 @@ public class ProgressImageView extends ImageView{
         paint.setTextSize(18*density);
         String text=(int)progress+"%";
         int textWidth=getTextWidth(paint,text);
-        double radius=Math.toRadians(getRotation());
+        double radius=Math.toRadians(Math.abs(getRotation()));
         float he=Math.abs(height);
         float yRight=(float) (getHeight()*Math.cos(radius));
         canvas.drawText(text,caculateTextCenterX(height,xOffset,yOffset,maskHeight)-textWidth/2,y-5*density,paint);
@@ -89,6 +90,7 @@ public class ProgressImageView extends ImageView{
 
     public void setProgress(float progress) {
         this.progress = progress;
+        invalidate();
     }
 
      int getTextWidth(Paint paint, String str) {
@@ -106,19 +108,37 @@ public class ProgressImageView extends ImageView{
 
 
     int caculateTextCenterX(float height,float xOffset,float yOffset,int maskHeight){
-        double radius=Math.toRadians(getRotation());
+        double radius=Math.toRadians(Math.abs(getRotation()));
+        boolean isRotationNegative=getRotation()>0?false:true;
         float he=Math.abs(height);
         float yLeft= (float) (getWidth()*Math.sin(radius));
         float yRight=(float) (getHeight()*Math.cos(radius));
         int v;
         if(he<=yLeft){
-            he=he;
-            v=(int) ((getWidth()-he/Math.sin(radius))*Math.cos(radius)+he*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset);
-        }else if(he <=yRight){
-            v=(int) ((getWidth()-yLeft/Math.sin(radius))*Math.cos(radius)+yLeft*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset+(he-yLeft)*Math.tan(radius));
+            v = (int) ((getWidth() - he / Math.sin(radius)) * Math.cos(radius) + he * (Math.tan(radius) + 1 / Math.tan(radius)) / 2 - xOffset);
+            if(isRotationNegative){
+                v=getWidth()-v;
+            }
+            Log.d("ddd1",v+":");
+        }else if(he <yRight){
+            if(isRotationNegative){
+                v=(int) ((getWidth()-yLeft/Math.sin(radius))*Math.cos(radius)+yLeft*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset);
+                v= (int) (getWidth()-v-(he-yLeft)*Math.tan(radius));
+
+            }else{
+                v=(int) ((getWidth()-yLeft/Math.sin(radius))*Math.cos(radius)+yLeft*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset+(he-yLeft)*Math.tan(radius));
+            }
+            Log.d("ddd2",v+":");
+
+
+
         }else{
             he=maskHeight-he;
             v=(int) (getWidth()-((getWidth()-he/Math.sin(radius))*Math.cos(radius)+he*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset));
+            if(isRotationNegative){
+                v=getWidth()-v;
+            }
+            Log.d("ddd3",v+":");
         }
 
         return v;

@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         ObjectAnimator oa=ObjectAnimator.ofFloat(piv,"progress",0,100);
         oa.setDuration(20000);
         oa.start();
-
+       // piv.setProgress(43);
     }
     private class MyEvaluator implements TypeEvaluator{
 
