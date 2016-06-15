@@ -2,12 +2,16 @@ package com.pz.demo;
 
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
+import android.graphics.Xfermode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
@@ -58,6 +62,7 @@ public class ProgressImageView extends ImageView{
         can.rotate(-rotation,getWidth()/2,getHeight()/2);
         float height=caculateProgress(rectPoint.y);
         can.translate(0,height);
+        can.clipRect((float) (getWidth()*Math.cos(Math.toRadians(Math.abs(rotation)))),getHeight()+yOffset,yOffset,-yOffset);
         can.drawRect(-xOffset,-yOffset,rectPoint.x-xOffset,rectPoint.y-yOffset,paint);
         drawText(can,rectPoint.y-yOffset,height,xOffset,yOffset,rectPoint.y);
         invalidate();
@@ -119,7 +124,6 @@ public class ProgressImageView extends ImageView{
             if(isRotationNegative){
                 v=getWidth()-v;
             }
-            Log.d("ddd1",v+":");
         }else if(he <yRight){
             if(isRotationNegative){
                 v=(int) ((getWidth()-yLeft/Math.sin(radius))*Math.cos(radius)+yLeft*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset);
@@ -128,7 +132,6 @@ public class ProgressImageView extends ImageView{
             }else{
                 v=(int) ((getWidth()-yLeft/Math.sin(radius))*Math.cos(radius)+yLeft*(Math.tan(radius)+1/Math.tan(radius))/2-xOffset+(he-yLeft)*Math.tan(radius));
             }
-            Log.d("ddd2",v+":");
 
 
 
@@ -138,7 +141,6 @@ public class ProgressImageView extends ImageView{
             if(isRotationNegative){
                 v=getWidth()-v;
             }
-            Log.d("ddd3",v+":");
         }
 
         return v;
