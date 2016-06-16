@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -41,6 +42,7 @@ public class ProgressImageView extends ImageView{
 
     void init(Context context){
         density=context.getResources().getDisplayMetrics().density;
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
 
     }
 
@@ -50,21 +52,20 @@ public class ProgressImageView extends ImageView{
         drawProgress(canvas);
     }
 
-    void drawProgress(Canvas can){
-        float rotation=getRotation();
-        Point rectPoint=caculateMaskRectWidthAndHeight(getWidth(),getHeight());
-        int xOffset=(rectPoint.x-getWidth())/2;
-        int yOffset=(rectPoint.y-getHeight())/2;
-        Paint paint=new Paint();
+    void drawProgress(Canvas can) {
+        float rotation = getRotation();
+        Point rectPoint = caculateMaskRectWidthAndHeight(getWidth(), getHeight());
+        int xOffset = (rectPoint.x - getWidth()) / 2;
+        int yOffset = (rectPoint.y - getHeight()) / 2;
+        Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setAlpha(122);
         paint.setAntiAlias(true);
-        can.rotate(-rotation,getWidth()/2,getHeight()/2);
-        float height=caculateProgress(rectPoint.y);
-        can.translate(0,height);
-        can.clipRect((float) (getWidth()*Math.cos(Math.toRadians(Math.abs(rotation)))),getHeight()+yOffset,yOffset,-yOffset);
-        can.drawRect(-xOffset,-yOffset,rectPoint.x-xOffset,rectPoint.y-yOffset,paint);
-        drawText(can,rectPoint.y-yOffset,height,xOffset,yOffset,rectPoint.y);
+        can.rotate(-rotation, getWidth() / 2, getHeight() / 2);
+        float height = caculateProgress(rectPoint.y);
+        can.translate(0, height);
+        can.drawRect(-xOffset, -yOffset, rectPoint.x - xOffset, rectPoint.y - yOffset, paint);
+        drawText(can, rectPoint.y - yOffset, height, xOffset, yOffset, rectPoint.y);
         invalidate();
     }
 
