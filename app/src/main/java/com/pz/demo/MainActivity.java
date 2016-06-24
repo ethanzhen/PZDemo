@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.pz.demo.fragment.FragmentFlashlight;
 import com.pz.demo.fragment.FragmentMain;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        replaceFragment(new FragmentMain());
+        replaceFragment(new FragmentFlashlight());
 
     }
 
@@ -28,5 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public void replaceFragment(Fragment f){
         getSupportFragmentManager().beginTransaction().replace(R.id.activity_main_fl,f).commit();
     }
+
+
 
 }
